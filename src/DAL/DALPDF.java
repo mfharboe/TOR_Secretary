@@ -173,11 +173,10 @@ public class DALPDF {
             
            //System.out.println("" + wage439 +" "+ wage442 +" "+ wage443 +" "+ wage446 +" "+ wage447 +" " +wage449);
             
-
-            for (BESalary besalary : salary) {
-                int i = 0;
-                i++;
-                PdfPCell cellO3 = new PdfPCell(new Paragraph("" + besalary.getM_id()));
+            
+            for (int i = 0; i<totals.size(); i++) {
+                System.out.println(i);
+                PdfPCell cellO3 = new PdfPCell(new Paragraph("" + salary.get(i).getM_id()));
                 PdfPCell cellO4 = new PdfPCell(new Paragraph("" + totals.get(i)));
 
                 tableOverwiev.addCell(cellO3);

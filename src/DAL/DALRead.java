@@ -38,7 +38,7 @@ public class DALRead {
 
     public ArrayList<BEWage> readInfo(String from, String to) throws SQLException {
         ArrayList<BEWage> res = new ArrayList<>();
-        String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.[description] as 'incidentDescription', [Role].[description] as 'roleDescription',[Role/Time].[hours], Salary.id \n"
+        String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.incidentTypeDescription, [Role].roleDescription,[Role/Time].[hours], Salary.id \n"
                 + "From [Role/Time] \n"
                 + "inner join Fireman on Fireman.id = [Role/Time].firemanId \n"
                 + "inner join Incident on [Role/Time].incidentId = Incident.id \n"
@@ -58,7 +58,7 @@ public class DALRead {
             String firstname = result.getString("firstName");
             String incidentname = result.getString("incidentName");
             Date date = result.getDate("date");
-            String incidentdescription = result.getString("incidentDescription");
+            String incidentdescription = result.getString("incidentTypeDescription");
             String roledescription = result.getString("roleDescription");
             int hours = result.getInt("hours");
             int salaryid = result.getInt("id");
@@ -68,7 +68,7 @@ public class DALRead {
         }
         return res;
     }
-    
+
     public ArrayList<BEFireman> readFiremen() throws SQLException {
         ArrayList<BEFireman> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -90,13 +90,13 @@ public class DALRead {
             int paymentNumber = result.getInt("paymentNumber");
             boolean isTeamLeader = result.getBoolean("isTeamLeader");
             String photoPath = result.getString("photoPath");
-            String cpr = result.getString("cpr");
-            BEFireman be = new BEFireman(id, firstName, lastName, address, refZipCode, phone, paymentNumber, isTeamLeader, photoPath, cpr);
+            //String cpr = result.getString("cpr");
+            BEFireman be = new BEFireman(id, firstName, lastName, address, refZipCode, phone, paymentNumber, isTeamLeader, photoPath);
             res.add(be);
         }
         return res;
     }
-    
+
     public ArrayList<BEZipcode> readZipcodes() throws SQLException {
         ArrayList<BEZipcode> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -110,19 +110,25 @@ public class DALRead {
         }
         return res;
     }
-    
-    public ArrayList<BESalary> readAllSalaries() throws SQLException{
+
+    public ArrayList<BESalary> readAllSalaries() throws SQLException {
         ArrayList<BESalary> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
         stm.execute("select * from Salary");
         ResultSet result = stm.getResultSet();
-        while(result.next()){
+        while (result.next()) {
             int id = result.getInt("id");
             String salaryDescription = result.getString("salaryDescription");
             BESalary be = new BESalary(id, salaryDescription);
             res.add(be);
         }
+        for (BESalary besa : res) {
+            System.out.println(besa.getM_id());
+            System.out.println(besa.getM_salaryDescription());
+        }
+
+
         return res;
-        
+
     }
 }

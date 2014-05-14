@@ -13,7 +13,7 @@ public class BEFireman {
     private int m_paymentNumber;
     private boolean m_isTeamLeader;
     private String m_photoPath;
-    private String m_cpr;
+    
 
     /**
      * Read Fireman
@@ -30,7 +30,7 @@ public class BEFireman {
      * @param cpr
      */
     public BEFireman(int id, String firstname, String lastname, String address, BEZipcode zipcode,
-            int phone, int paymentnumber, boolean isteamleader, String photopath, String cpr) {
+            int phone, int paymentnumber, boolean isteamleader, String photopath) {
 
         m_id = id;
         m_firstName = firstname;
@@ -41,7 +41,7 @@ public class BEFireman {
         m_paymentNumber = paymentnumber;
         m_isTeamLeader = isteamleader;
         m_photoPath = photopath;
-        m_cpr = cpr;
+        
 
     }
 
@@ -174,16 +174,7 @@ public class BEFireman {
     /**
      * @return the m_cpr
      */
-    public String getM_cpr() {
-        return m_cpr;
-    }
-
-    /**
-     * @param m_cpr the m_cpr to set
-     */
-    public void setM_cpr(String m_cpr) {
-        this.m_cpr = m_cpr;
-    }
+  
     
     public String toString(){
         return getM_lastName() + ", " + getM_firstName();

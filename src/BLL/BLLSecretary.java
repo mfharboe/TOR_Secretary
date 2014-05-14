@@ -95,7 +95,8 @@ public class BLLSecretary {
     }
     
     public void sendToPdfFireman(ArrayList<BEWage> be,BEFireman befireman, String from, String to ){
-        DALPDF.getInstance().printPDFFireman(be,befireman, from, to, readAllSalaries());
+        readAllSalaries();
+        DALPDF.getInstance().printPDFFireman(be,befireman, from, to, salary );
     }
     public void sendToPdfRooster(ArrayList<BEWage> be, String from, String to ){
         DALPDF.getInstance().printPDFRooster(be, from, to);
