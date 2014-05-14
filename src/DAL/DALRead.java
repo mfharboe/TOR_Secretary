@@ -6,6 +6,7 @@ package DAL;
 
 import BE.BEFireman;
 import BE.BESalary;
+import BE.BEWage;
 import BE.BEZipcode;
 import java.sql.Connection;
 import java.sql.Date;
@@ -35,9 +36,9 @@ public class DALRead {
         return m_instance;
     }
 
-    public ArrayList<BESalary> readInfo(String from, String to) throws SQLException {
-        ArrayList<BESalary> res = new ArrayList<>();
-        String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.[description] as 'incidentDescription', [Role].[description] as 'roleDescription', Salary.id \n"
+    public ArrayList<BEWage> readInfo(String from, String to) throws SQLException {
+        ArrayList<BEWage> res = new ArrayList<>();
+        String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.[description] as 'incidentDescription', [Role].[description] as 'roleDescription',[Role/Time].[hours], Salary.id \n"
                 + "From [Role/Time] \n"
                 + "inner join Fireman on Fireman.id = [Role/Time].firemanId \n"
                 + "inner join Incident on [Role/Time].incidentId = Incident.id \n"
@@ -59,9 +60,10 @@ public class DALRead {
             Date date = result.getDate("date");
             String incidentdescription = result.getString("incidentDescription");
             String roledescription = result.getString("roleDescription");
+            int hours = result.getInt("hours");
             int salaryid = result.getInt("id");
 
-            BESalary be = new BESalary(lastname, firstname, incidentname, date, incidentdescription, roledescription, salaryid);
+            BEWage be = new BEWage(lastname, firstname, incidentname, date, incidentdescription, roledescription, hours, salaryid);
             res.add(be);
         }
         return res;
@@ -107,5 +109,20 @@ public class DALRead {
             res.add(be);
         }
         return res;
+    }
+    
+    public ArrayList<BESalary> readAllSalaries() throws SQLException{
+        ArrayList<BESalary> res = new ArrayList<>();
+        Statement stm = m_connection.createStatement();
+        stm.execute("select * from Salary");
+        ResultSet result = stm.getResultSet();
+        while(result.next()){
+            int id = result.getInt("id");
+            String salaryDescription = result.getString("salaryDescription");
+            BESalary be = new BESalary(id, salaryDescription);
+            res.add(be);
+        }
+        return res;
+        
     }
 }

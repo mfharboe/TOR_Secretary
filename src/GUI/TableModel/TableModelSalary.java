@@ -4,7 +4,7 @@
  */
 package GUI.TableModel;
 
-import BE.BESalary;
+import BE.BEWage;
 import java.awt.List;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -16,13 +16,14 @@ import javax.swing.table.AbstractTableModel;
  */
 public class TableModelSalary extends AbstractTableModel {
 
-    private ArrayList<BESalary> salary;
+    private ArrayList<BEWage> salary;
     private final String[] colNames = {"Efternavn",
         "Fornavn",
         "Indsats navn",
         "Dato",
         "Indsats type",
         "Funktion",
+        "Timer",
         "Lønkode"};
     private final Class[] classes = {String.class,
         String.class,
@@ -30,6 +31,7 @@ public class TableModelSalary extends AbstractTableModel {
         Date.class,
         String.class,
         String.class,
+        int.class,
         int.class};
 
     /**
@@ -37,7 +39,7 @@ public class TableModelSalary extends AbstractTableModel {
      *
      * @param allSalaries
      */
-    public TableModelSalary(ArrayList<BESalary> allSalaries) {
+    public TableModelSalary(ArrayList<BEWage> allSalaries) {
         salary = allSalaries;
         fireTableDataChanged();
     }
@@ -68,7 +70,7 @@ public class TableModelSalary extends AbstractTableModel {
      */
     @Override
     public Object getValueAt(int row, int col) {
-        BESalary e = salary.get(row);
+        BEWage e = salary.get(row);
         switch (col) {
             case 0:
                 return e.getM_lastName();
@@ -83,6 +85,8 @@ public class TableModelSalary extends AbstractTableModel {
             case 5:
                 return e.getM_roleType();
             case 6:
+                return e.getM_hours();
+            case 7:
                 return e.getM_salaryId();
         }
 
@@ -126,7 +130,7 @@ public class TableModelSalary extends AbstractTableModel {
      *
      * @param SalaryList
      */
-    public void setSalaryList(ArrayList<BESalary> salaryList) {
+    public void setSalaryList(ArrayList<BEWage> salaryList) {
         salary = salaryList;
         fireTableDataChanged();
     }
@@ -136,13 +140,13 @@ public class TableModelSalary extends AbstractTableModel {
      * @param row
      * @return the salary set at the given row index
      */
-    public BESalary getSalaryByRow(int row) {
+    public BEWage getSalaryByRow(int row) {
         return salary.get(row);
     }
     
-    public ArrayList<BESalary> getSalaryListByRow(int... rows){
+    public ArrayList<BEWage> getSalaryListByRow(int... rows){
         ArrayList<Integer> tmp = new ArrayList<>();
-        ArrayList<BESalary> besalary = new ArrayList<>();
+        ArrayList<BEWage> besalary = new ArrayList<>();
         for(int i = 0; i < rows.length; i++){
             tmp.add(rows[i]);
         }

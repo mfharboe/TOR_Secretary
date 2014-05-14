@@ -1,7 +1,7 @@
 package GUI;
 
 import BE.BEFireman;
-import BE.BESalary;
+import BE.BEWage;
 import BLL.BLLSecretary;
 import GUI.TableModel.TableModelSalary;
 import java.awt.event.ActionEvent;
@@ -22,11 +22,11 @@ import javax.swing.table.TableRowSorter;
 public class GUI_Secretary extends javax.swing.JFrame {
 
     private TableModelSalary salaryModel;
-    private final ArrayList<BESalary> EMPTY_ARRAY_LIST = new ArrayList<>();
+    private final ArrayList<BEWage> EMPTY_ARRAY_LIST = new ArrayList<>();
     TableRowSorter<TableModelSalary> sorter;
-    ArrayList<BESalary> salary = new ArrayList<>();
+    ArrayList<BEWage> salary = new ArrayList<>();
     int[] selectedRows;
-    BESalary besalary;
+    BEWage besalary;
 
     public GUI_Secretary() {
         initComponents();
@@ -63,49 +63,42 @@ public class GUI_Secretary extends javax.swing.JFrame {
         salaryModel = new TableModelSalary(EMPTY_ARRAY_LIST);
         tblSalary.setModel(salaryModel);
     }
-    
-    private void searchForFiremen(){
+
+    private void searchForFiremen() {
         String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
         String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
-        if(cmbFiremen.getSelectedIndex() != 0){
-        BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
-        salary = BLLSecretary.getInstance().BLLSearchWithFiremen(befireman,from, to);
-        salaryModel = new TableModelSalary(salary);
-        }
-        else{
+        if (cmbFiremen.getSelectedIndex() != 0) {
+            BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
+            salary = BLLSecretary.getInstance().BLLSearchWithFiremen(befireman, from, to);
+            salaryModel = new TableModelSalary(salary);
+        } else {
             salary = BLLSecretary.getInstance().BLLSearch(from, to);
             salaryModel = new TableModelSalary(salary);
         }
         tblSalary.setModel(salaryModel);
         sorter = new TableRowSorter<>(salaryModel);
         tblSalary.setRowSorter(sorter);
-        
+
     }
 
     private void onClickSearch() {
         searchForFiremen();
     }
-    
-    private void onClickPrint(){
-        if(!salary.isEmpty())
-        BLLSecretary.getInstance().sendToPdf(salary);
+
+    private void onClickPrintFireman(BEFireman befireman, String from, String to) {
+
+        if (!salary.isEmpty()) {
+            BLLSecretary.getInstance().sendToPdfFireman(salary, befireman, from, to);
+        }
     }
 
-//    private void onClickPrint() {
-//        int rows[] = tblSalary.getSelectedRows();
-//        ArrayList<BESalary> be = new ArrayList<>();
-//        for (int i = 0; i < rows.length; i++) {
-//            int modelRow = sorter.convertRowIndexToModel(rows[i]);
-//            be.add(salaryModel.getSalaryByRow(modelRow));
-//            System.out.println(be.get(i).getM_lastName());
-//            BLLSecretary.getInstance().sendToPdf(be);
-//        }
-//    }
+    private void onClickPrintRooster(String from, String to) {
+        if (!salary.isEmpty()) {
+            BLLSecretary.getInstance().sendToPdfRooster(salary, from, to);
+    
+        }
+    }
 
-//    private void onClickPrint() {
-//        //for(BESalary be : salaryModel.getSalaryListByRow(tblSalary.getSelectedRows()))
-//            System.out.println(besalary.getM_lastName());
-//    }
     private void onMoucseClick() {
         if (tblSalary.getSelectedRow() != -1) {
             int idx = tblSalary.getSelectedRow();
@@ -118,8 +111,6 @@ public class GUI_Secretary extends javax.swing.JFrame {
         }
     }
 
-
-
     private class btnAction implements ActionListener {
 
         @Override
@@ -128,7 +119,14 @@ public class GUI_Secretary extends javax.swing.JFrame {
                 onClickSearch();
             }
             if (e.getSource().equals(btnPrint)) {
-                onClickPrint();
+                String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
+                String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
+                if (cmbFiremen.getSelectedIndex() != 0) {
+                BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
+                    onClickPrintFireman(befireman, from, to);
+                } else if(cmbFiremen.getSelectedIndex() == 0) {
+                    onClickPrintRooster(from, to);
+                }
             }
         }
     }
@@ -141,8 +139,6 @@ public class GUI_Secretary extends javax.swing.JFrame {
 
         }
     }
-
-    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
