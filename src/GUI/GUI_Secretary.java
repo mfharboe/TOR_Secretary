@@ -1,7 +1,7 @@
 package GUI;
 
 import BE.BEFireman;
-import BE.BEWage;
+import BE.BESalary;
 import BLL.BLLSecretary;
 import GUI.TableModel.TableModelSalary;
 import java.awt.event.ActionEvent;
@@ -22,11 +22,11 @@ import javax.swing.table.TableRowSorter;
 public class GUI_Secretary extends javax.swing.JFrame {
 
     private TableModelSalary salaryModel;
-    private final ArrayList<BEWage> EMPTY_ARRAY_LIST = new ArrayList<>();
+    private final ArrayList<BESalary> EMPTY_ARRAY_LIST = new ArrayList<>();
     TableRowSorter<TableModelSalary> sorter;
-    ArrayList<BEWage> salary = new ArrayList<>();
+    ArrayList<BESalary> salary = new ArrayList<>();
     int[] selectedRows;
-    BEWage besalary;
+    BESalary besalary;
 
     public GUI_Secretary() {
         initComponents();
@@ -37,8 +37,9 @@ public class GUI_Secretary extends javax.swing.JFrame {
     private void initializeSettings() {
         setTable();
         addListeners();
-        tblSalary.setRowSelectionAllowed(true);
+//        tblSalary.setRowSelectionAllowed(true);
         fillComboFireman();
+        
 
 
     }
@@ -55,6 +56,7 @@ public class GUI_Secretary extends javax.swing.JFrame {
         mouseAction click = new mouseAction();
         btnSearch.addActionListener(btn);
         btnPrint.addActionListener(btn);
+        btnUsage.addActionListener(btn);
         tblSalary.addMouseListener(click);
 
     }
@@ -69,10 +71,10 @@ public class GUI_Secretary extends javax.swing.JFrame {
         String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
         if (cmbFiremen.getSelectedIndex() != 0) {
             BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
-            salary = BLLSecretary.getInstance().BLLSearchWithFiremen(befireman, from, to);
+            salary = BLLSecretary.getInstance().readSalariesInTimePeriodWithFiremen(befireman, from, to);
             salaryModel = new TableModelSalary(salary);
         } else {
-            salary = BLLSecretary.getInstance().BLLSearch(from, to);
+            salary = BLLSecretary.getInstance().readSalariesInTimePeriod(from, to);
             salaryModel = new TableModelSalary(salary);
         }
         tblSalary.setModel(salaryModel);
@@ -98,8 +100,14 @@ public class GUI_Secretary extends javax.swing.JFrame {
     
         }
     }
+    
+    private void onClickUsage(){
+        GUI_Usage guiUsage = new GUI_Usage();
+        guiUsage.setVisible(true);
+    }
 
     private void onMoucseClick() {
+       
         if (tblSalary.getSelectedRow() != -1) {
             int idx = tblSalary.getSelectedRow();
             int modelRow = sorter.convertRowIndexToModel(idx);
@@ -128,6 +136,8 @@ public class GUI_Secretary extends javax.swing.JFrame {
                     onClickPrintRooster(from, to);
                 }
             }
+            if(e.getSource().equals(btnUsage))
+                onClickUsage();
         }
     }
 

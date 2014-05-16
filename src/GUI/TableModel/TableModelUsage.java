@@ -4,9 +4,7 @@
  */
 package GUI.TableModel;
 
-import BE.BESalary;
-import java.awt.List;
-import java.sql.Date;
+import BE.BEUsage;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
@@ -14,33 +12,23 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author Morten
  */
-public class TableModelSalary extends AbstractTableModel {
-
-    private ArrayList<BESalary> salary;
-    private final String[] colNames = {"Efternavn",
-        "Fornavn",
-        "Indsats navn",
-        "Dato",
-        "Indsats type",
-        "Funktion",
-        "Timer"
-       };
+public class TableModelUsage extends AbstractTableModel{
+    
+    private ArrayList<BEUsage> usage;
+    private final String[] colNames = {"Materiel",
+        "Antal"};
     private final Class[] classes = {String.class,
         String.class,
-        String.class,
-        Date.class,
-        String.class,
-        String.class,
-        int.class,
+        
        };
 
     /**
      * Updates the model
      *
-     * @param allSalaries
+     * @param allUsages
      */
-    public TableModelSalary(ArrayList<BESalary> allSalaries) {
-        salary = allSalaries;
+    public TableModelUsage(ArrayList<BEUsage> allusages) {
+        usage = allusages;
         fireTableDataChanged();
     }
 
@@ -50,7 +38,7 @@ public class TableModelSalary extends AbstractTableModel {
      */
     @Override
     public int getRowCount() {
-        return salary.size();
+        return usage.size();
     }
 
     /**
@@ -70,22 +58,13 @@ public class TableModelSalary extends AbstractTableModel {
      */
     @Override
     public Object getValueAt(int row, int col) {
-        BESalary e = salary.get(row);
+        BEUsage e = usage.get(row);
         switch (col) {
             case 0:
-                return e.getM_lastName();
+                return e.getM_material().getM_description();
             case 1:
-                return e.getM_firstName();
-            case 2:
-                return e.getM_incidentName();
-            case 3:
-                return e.getM_date();
-            case 4:
-                return e.getM_incidentType();
-            case 5:
-                return e.getM_roleType();
-            case 6:
-                return e.getM_hours();
+                return e.getM_amount();
+           
             
         }
 
@@ -125,35 +104,36 @@ public class TableModelSalary extends AbstractTableModel {
     }
 
     /**
-     * Sets the content of the table model to the given list of salaries
+     * Sets the content of the table model to the given list of usages
      *
-     * @param SalaryList
+     * @param usageList
      */
-    public void setSalaryList(ArrayList<BESalary> salaryList) {
-        salary = salaryList;
+    public void setUsageList(ArrayList<BEUsage> usageList) {
+        usage = usageList;
         fireTableDataChanged();
     }
 
     /**
      *
      * @param row
-     * @return the salary set at the given row index
+     * @return the usage set at the given row index
      */
-    public BESalary getSalaryByRow(int row) {
-        return salary.get(row);
+    public BEUsage getUsageByRow(int row) {
+        return usage.get(row);
     }
     
-    public ArrayList<BESalary> getSalaryListByRow(int... rows){
+    public ArrayList<BEUsage> getUsageListByRow(int... rows){
         ArrayList<Integer> tmp = new ArrayList<>();
-        ArrayList<BESalary> besalary = new ArrayList<>();
+        ArrayList<BEUsage> beusage = new ArrayList<>();
         for(int i = 0; i < rows.length; i++){
             tmp.add(rows[i]);
         }
         for(int u : tmp){
-            besalary.add(salary.get(u));
+            beusage.add(usage.get(u));
             
         }
-        return besalary;
+        return beusage;
         
     }
+    
 }

@@ -4,9 +4,14 @@
  */
 package DAL;
 
+import BE.BEAlarm;
 import BE.BEFireman;
+import BE.BEIncident;
+import BE.BEIncidentDetails;
+import BE.BEIncidentType;
+import BE.BEMaterial;
+import BE.BEUsage;
 import BE.BESalary;
-import BE.BEWage;
 import BE.BEZipcode;
 import java.sql.Connection;
 import java.sql.Date;
@@ -14,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +30,8 @@ public class DALRead {
 
     Connection m_connection;
     private static DALRead m_instance;
+    ArrayList<BEIncidentType> resIncidentType;
+    ArrayList<BEAlarm> resAlarms;
 
     private DALRead() {
         m_connection = DB_Connection.getInstance().getConnection();
@@ -36,15 +44,14 @@ public class DALRead {
         return m_instance;
     }
 
-    public ArrayList<BEWage> readInfo(String from, String to) throws SQLException {
-        ArrayList<BEWage> res = new ArrayList<>();
-        String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.incidentTypeDescription, [Role].roleDescription,[Role/Time].[hours], Salary.id \n"
+    public ArrayList<BESalary> readInfo(String from, String to) throws SQLException {
+        ArrayList<BESalary> res = new ArrayList<>();
+        String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.incidentTypeDescription, [Role].roleDescription,[Role/Time].[hours] \n"
                 + "From [Role/Time] \n"
                 + "inner join Fireman on Fireman.id = [Role/Time].firemanId \n"
                 + "inner join Incident on [Role/Time].incidentId = Incident.id \n"
                 + "inner join IncidentType on Incident.incidentTypeId = IncidentType.id\n"
                 + "inner join [Role] on [Role/Time].roleId = [Role].id\n"
-                + "inner join Salary on [Role/Time].salaryId = Salary.id\n"
                 + "where Incident.date >= ? and Incident.date <= ?\n"
                 + "order by lastname, firstname, date";
 
@@ -61,9 +68,9 @@ public class DALRead {
             String incidentdescription = result.getString("incidentTypeDescription");
             String roledescription = result.getString("roleDescription");
             int hours = result.getInt("hours");
-            int salaryid = result.getInt("id");
 
-            BEWage be = new BEWage(lastname, firstname, incidentname, date, incidentdescription, roledescription, hours, salaryid);
+
+            BESalary be = new BESalary(lastname, firstname, incidentname, date, incidentdescription, roledescription, hours);
             res.add(be);
         }
         return res;
@@ -111,23 +118,172 @@ public class DALRead {
         return res;
     }
 
-    public ArrayList<BESalary> readAllSalaries() throws SQLException {
-        ArrayList<BESalary> res = new ArrayList<>();
+    public ArrayList<BEIncidentType> readIncidentTypes() throws SQLException {
+        if (resIncidentType == null) {
+            resIncidentType = new ArrayList<>();
+            Statement stm = m_connection.createStatement();
+            stm.execute("select * from IncidentType");
+            ResultSet result = stm.getResultSet();
+            while (result.next()) {
+                int id = result.getInt("id");
+                String description = result.getString("incidentTypeDescription");
+                BEIncidentType be = new BEIncidentType(id, description);
+                resIncidentType.add(be);
+            }
+        }
+        return resIncidentType;
+    }
+
+    public ArrayList<BEAlarm> readAlarms() throws SQLException {
+        if (resAlarms == null) {
+            resAlarms = new ArrayList<>();
+            Statement stm = m_connection.createStatement();
+            stm.execute("select * from Alarm");
+            ResultSet result = stm.getResultSet();
+            while (result.next()) {
+                int id = result.getInt("id");
+                String description = result.getString("alarmDescription");
+                BEAlarm be = new BEAlarm(id, description);
+                resAlarms.add(be);
+            }
+        }
+        return resAlarms;
+    }
+
+    public ArrayList<BEIncident> readIncidents() throws SQLException {
+        ArrayList<BEIncident> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
-        stm.execute("select * from Salary");
+        stm.execute("select * from Incident");
         ResultSet result = stm.getResultSet();
         while (result.next()) {
             int id = result.getInt("id");
-            String salaryDescription = result.getString("salaryDescription");
-            BESalary be = new BESalary(id, salaryDescription);
+            String incidentName = result.getString("incidentName");
+            Date date = result.getDate("date");
+            Time time = result.getTime("startTime");
+            int incidentTypeId = result.getInt("incidentTypeId");
+            BEIncidentType refIncidentType = null;
+            for (BEIncidentType beincidenttype : readIncidentTypes()) {
+                if (beincidenttype.getM_id() == incidentTypeId) {
+                    refIncidentType = beincidenttype;
+                }
+            }
+            boolean isDone = result.getBoolean("isDone");
+            BEIncident be = new BEIncident(id, incidentName, date, time, refIncidentType, isDone);
             res.add(be);
         }
-        for (BESalary besa : res) {
-            System.out.println(besa.getM_id());
-            System.out.println(besa.getM_salaryDescription());
+        return res;
+    }
+
+    public ArrayList<BEIncidentDetails> readIncidentDetails() throws SQLException {
+        ArrayList<BEIncidentDetails> res = new ArrayList<>();
+        Statement stm = m_connection.createStatement();
+        stm.execute("Select IncidentDetails.incidentLeader, "
+                + "IncidentDetails.evaNumber, "
+                + "IncidentDetails.fireReport, "
+                + "IncidentDetails.incidentid, "
+                + "IncidentDetails.involvedName, "
+                + "IncidentDetails.involvedAddress, "
+                + "IncidentDetails.remark, "
+                + "IncidentDetails.alarmId,"
+                + "IncidentDetails.detectorNumber,"
+                + "IncidentDetails.groupNumber "
+                + "from IncidentDetails inner join Incident "
+                + "on IncidentDetails.incidentId = incident.id ");
+        ResultSet result = stm.getResultSet();
+        while (result.next()) {
+            String incidentLeader = result.getString("incidentLeader");
+            String evaNumber = result.getString("evaNumber");
+            String fireReport = result.getString("fireReport");
+            int incidentId = result.getInt("incidentId");
+            BEIncident refIncident = null;
+            for (BEIncident be : readIncidents()) {
+                if (be.getM_id() == incidentId) {
+                    refIncident = be;
+                    break;
+                }
+            }
+            String involvedName = result.getString("involvedName");
+            String involvedAddress = result.getString("involvedAddress");
+            String remark = result.getString("remark");
+            int alarmId = result.getInt("alarmId");
+            BEAlarm refAlarm = null;
+            for (BEAlarm be : readAlarms()) {
+                if (be.getM_id() == alarmId) {
+                    refAlarm = be;
+                    break;
+                }
+            }
+            String detectorNumber = result.getString("detectorNumber");
+            String groupNumber = result.getString("groupNumber");
+
+            BEIncidentDetails be = new BEIncidentDetails(incidentLeader,
+                    evaNumber,
+                    fireReport,
+                    
+                    refIncident,
+                    involvedName,
+                    involvedAddress,
+                    remark,
+                    refAlarm,
+                    detectorNumber,
+                    groupNumber);
+
+            res.add(be);
         }
 
+        return res;
 
+    }
+
+    public ArrayList<BEUsage> readUsage() throws SQLException {
+        ArrayList<BEUsage> res = new ArrayList<>();
+        Statement stm = m_connection.createStatement();
+        stm.execute("select * from Usage "
+                + "inner join Incident "
+                + "on Usage.incidentId = Incident.id ");
+        ResultSet result = stm.getResultSet();
+        while (result.next()) {
+            int id = result.getInt("id");
+            int materialId = result.getInt("materialId");
+            BEMaterial refMaterial = null;
+            for (BEMaterial be : readMaterial()) {
+                if (be.getM_id() == materialId) {
+                    refMaterial = be;
+                }
+            }
+            int amount = result.getInt("amount");
+            int incidentId = result.getInt("incidentId");
+            BEIncident refIncident = null;
+            for (BEIncident be : readIncidents()) {
+                if (be.getM_id() == incidentId) {
+                    refIncident = be;
+                }
+            }
+            BEUsage be = new BEUsage(id, refMaterial, amount, refIncident);
+            res.add(be);
+        }
+
+        return res;
+
+    }
+
+    /**
+     * Creates an ArrayList of Material
+     *
+     * @return ArrayList of Material
+     * @throws SQLException
+     */
+    public ArrayList<BEMaterial> readMaterial() throws SQLException {
+        ArrayList<BEMaterial> res = new ArrayList<>();
+        Statement stm = m_connection.createStatement();
+        stm.execute("select * from Material order by materialDescription");
+        ResultSet result = stm.getResultSet();
+        while (result.next()) {
+            int id = result.getInt("id");
+            String description = result.getString("materialDescription");
+            BEMaterial be = new BEMaterial(id, description);
+            res.add(be);
+        }
         return res;
 
     }
