@@ -4,6 +4,7 @@ import BE.BEFireman;
 import BE.BESalary;
 import BLL.BLLSecretary;
 import GUI.TableModel.TableModelSalary;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -35,13 +36,19 @@ public class GUI_Secretary extends javax.swing.JFrame {
     }
 
     private void initializeSettings() {
+        addColors();
         setTable();
         addListeners();
 //        tblSalary.setRowSelectionAllowed(true);
         fillComboFireman();
+    }
+    
+     private void addColors() {
+        this.getContentPane().setBackground(Color.WHITE);
+        jPanel1.setBackground(Color.WHITE);
+        jPanel2.setBackground(Color.WHITE);
+        cmbFiremen.setBackground(Color.WHITE);
         
-
-
     }
 
     private void fillComboFireman() {

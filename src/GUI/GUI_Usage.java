@@ -6,6 +6,7 @@ import BLL.BLLSecretary;
 import GUI.TableModel.TableModelIncident;
 import GUI.TableModel.TableModelSalary;
 import GUI.TableModel.TableModelUsage;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,9 +34,18 @@ public class GUI_Usage extends javax.swing.JFrame {
     }
 
     private void initializeSettings() {
+        addColors();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTable();
         addListeners();
+    }
+    
+     private void addColors() {
+        this.getContentPane().setBackground(Color.WHITE);
+        jPanel1.setBackground(Color.WHITE);
+        jPanel2.setBackground(Color.WHITE);
+        
+        
     }
 
     private void addListeners() {
@@ -43,6 +53,7 @@ public class GUI_Usage extends javax.swing.JFrame {
         mouseAction click = new mouseAction();
         btnSearch.addActionListener(btn);
         btnPrint.addActionListener(btn);
+        btnOk.addActionListener(btn);
         tblIncident.addMouseListener(click);
     }
 
@@ -105,6 +116,8 @@ public class GUI_Usage extends javax.swing.JFrame {
             if(e.getSource().equals(btnPrint)){
                 onClickPrint();
             }
+            if(e.getSource().equals(btnOk))
+                dispose();
         }
     }
 
@@ -234,15 +247,18 @@ public class GUI_Usage extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(2, 2, 2)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 960, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 960, javax.swing.GroupLayout.PREFERRED_SIZE)))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(890, 890, 890)
-                .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 960, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 960, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(890, 890, 890)
+                        .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -254,7 +270,8 @@ public class GUI_Usage extends javax.swing.JFrame {
                         .addGap(227, 227, 227)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(10, 10, 10)
-                .addComponent(btnOk))
+                .addComponent(btnOk)
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();

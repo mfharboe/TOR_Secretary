@@ -10,10 +10,12 @@ import BE.BEIncidentDetails;
 
 import BE.BESalary;
 import BE.BEUsage;
+import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -21,10 +23,13 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -33,8 +38,10 @@ import java.util.logging.Logger;
 public class DALPDF {
 
     private static DALPDF m_instance;
+    Image image1;
 
     private DALPDF() {
+        
     }
 
     public static DALPDF getInstance() {
@@ -53,6 +60,19 @@ public class DALPDF {
                     new FileOutputStream(be.get(0).getM_lastName() + ", " + be.get(0).getM_firstName() + " " + from + " - " + to + ".pdf"));
 
             document.open();
+            
+            try {
+                image1 = Image.getInstance("ebr.jpg");
+            } catch (BadElementException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            image1.setAlignment(Element.ALIGN_RIGHT);
+            image1.scalePercent(50);
+            document.add(image1);
             document.add(new Phrase("Navn : " + be.get(0).getM_lastName() + ", "));
             document.add(new Phrase(be.get(0).getM_firstName() + " "));
             document.add(new Paragraph("Addresse : " + befireman.getM_address() + ", " + befireman.getM_zipCode().getM_city() + " " + befireman.getM_zipCode().getM_zipCode()));
@@ -211,6 +231,20 @@ public class DALPDF {
                     new FileOutputStream("Dato " + from + " - " + to + ".pdf"));
 
             document.open();
+            
+            try {
+                image1 = Image.getInstance("ebr.jpg");
+            } catch (BadElementException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            image1.setAlignment(Element.ALIGN_RIGHT);
+            image1.scalePercent(50);
+            document.add(image1);
+            
             document.add(new Paragraph("Dato: Fra " + from + " Til " + to));
             document.add(new Paragraph(" "));
 
@@ -288,9 +322,21 @@ public class DALPDF {
         try {
 
             PdfWriter.getInstance(document,
-                    new FileOutputStream( beincident.getM_date() + " " +beincident.getM_incidentName()+  ".pdf"));
+                    new FileOutputStream(beincident.getM_date() + " " + beincident.getM_incidentName() + ".pdf"));
 
             document.open();
+            try {
+                image1 = Image.getInstance("ebr.jpg");
+            } catch (BadElementException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(DALPDF.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            image1.setAlignment(Element.ALIGN_RIGHT);
+            image1.scalePercent(50);
+            document.add(image1);
             Paragraph paragraphDate = new Paragraph("Dato : " + beincident.getM_date());
 
             paragraphDate.setAlignment(Element.ALIGN_RIGHT);
@@ -319,6 +365,16 @@ public class DALPDF {
             document.add(paragraphIncidentType);
 
             document.add(new Paragraph(" "));
+
+            Paragraph paragraphGroup = new Paragraph("Gruppe nummer : " + beIncidentDetails.get(0).getM_groupNumber());
+            paragraphGroup.setAlignment(Element.ALIGN_LEFT);
+            document.add(paragraphGroup);
+
+            Paragraph paragraphDetector = new Paragraph("Detektor nummer : " + beIncidentDetails.get(0).getM_detectorNumber());
+            paragraphDetector.setAlignment(Element.ALIGN_LEFT);
+            document.add(paragraphDetector);
+
+            document.add(new Paragraph(" "));
             document.add(new Paragraph(" "));
 
             Paragraph paragraphUsage = new Paragraph("Brugt materiel : ");
@@ -334,16 +390,16 @@ public class DALPDF {
 
             tableUsage.addCell(cell1);
             tableUsage.addCell(cell2);
-            
+
             tableUsage.completeRow();
 
             for (BEUsage beusage : usage) {
                 PdfPCell cell3 = new PdfPCell(new Paragraph(beusage.getM_material().getM_description()));
-                PdfPCell cell4 = new PdfPCell(new Paragraph("" +beusage.getM_amount()));
-                
+                PdfPCell cell4 = new PdfPCell(new Paragraph("" + beusage.getM_amount()));
+
                 cell3.setBackgroundColor(BaseColor.LIGHT_GRAY);
                 cell4.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                
+
                 tableUsage.addCell(cell3);
                 tableUsage.addCell(cell4);
             }
