@@ -10,7 +10,6 @@ import BE.BEIncidentDetails;
 import BE.BEUsage;
 
 import BE.BESalary;
-import DAL.DALPDF;
 import DAL.DALRead;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -47,7 +46,7 @@ public class BLLSecretary {
         try {
             salaries = DALRead.getInstance().readInfo(from, to);
         } catch (SQLException ex) {
-            Logger.getLogger(BLLSecretary.class.getName()).log(Level.SEVERE, null, ex);
+            BLLError.getInstance().readSalaryError();
         }
         return salaries;
 
@@ -72,8 +71,7 @@ public class BLLSecretary {
             }
             return besalary;
         } catch (SQLException ex) {
-            Logger.getLogger(BLLSecretary.class.getName()).log(Level.SEVERE, null, ex);
-        }
+           BLLError.getInstance().readSalaryError();}
         return null;
 
     }
@@ -83,30 +81,21 @@ public class BLLSecretary {
             try {
                 firemen = DALRead.getInstance().readFiremen();
             } catch (SQLException ex) {
+                BLLError.getInstance().readFiremanError();
                 return null;
             }
         }
         return firemen;
     }
 
-    public void sendToPdfFireman(ArrayList<BESalary> be, BEFireman befireman, String from, String to) {
-
-        DALPDF.getInstance().printPDFFireman(be, befireman, from, to);
-    }
-
-    public void sendToPdfRooster(ArrayList<BESalary> be, String from, String to) {
-        DALPDF.getInstance().printPDFRooster(be, from, to);
-    }
-    public void sendToPdfUsage(ArrayList<BEUsage> beusage, BEIncident beincident) {
-       DALPDF.getInstance().printPdfUsage(sortIncidentDetails(beincident), beincident, beusage);
-    }
     
     public ArrayList<BEIncident> readIncidents(){
         if(incidents == null){
             try {
                 incidents = DALRead.getInstance().readIncidents();
             } catch (SQLException ex) {
-                Logger.getLogger(BLLSecretary.class.getName()).log(Level.SEVERE, null, ex);
+                BLLError.getInstance().readIncidentError();
+                return null;
             }
         }
         return incidents;
@@ -131,7 +120,7 @@ public class BLLSecretary {
             try {
                 usage = DALRead.getInstance().readUsage();
             } catch (SQLException ex) {
-                Logger.getLogger(BLLSecretary.class.getName()).log(Level.SEVERE, null, ex);
+               BLLError.getInstance().readUsageError();
             }
         }
         return usage;
@@ -155,7 +144,7 @@ public class BLLSecretary {
             try {
                 incidentDetails = DALRead.getInstance().readIncidentDetails();
             } catch (SQLException ex) {
-                Logger.getLogger(BLLSecretary.class.getName()).log(Level.SEVERE, null, ex);
+               BLLError.getInstance().readIncidentDetailsError();
             }
         }
         return incidentDetails;

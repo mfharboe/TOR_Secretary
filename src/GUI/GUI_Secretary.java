@@ -2,44 +2,38 @@ package GUI;
 
 import BE.BEFireman;
 import BE.BESalary;
+import BLL.BLLError;
+import BLL.BLLPDFCreator;
 import BLL.BLLSecretary;
 import GUI.TableModel.TableModelSalary;
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import javax.swing.table.TableRowSorter;
 
 public class GUI_Secretary extends javax.swing.JFrame {
 
     private TableModelSalary salaryModel;
     private final ArrayList<BESalary> EMPTY_ARRAY_LIST = new ArrayList<>();
-    TableRowSorter<TableModelSalary> sorter;
     ArrayList<BESalary> salary = new ArrayList<>();
-    int[] selectedRows;
-    BESalary besalary;
+    ImageIcon imageLogo;
 
     public GUI_Secretary() {
-        initComponents();
+        BLLError.getInstance().register(MessageDialog.getInstance());
+        initComponents();        
         initializeSettings();
 
     }
 
     private void initializeSettings() {
         addColors();
+        addImage();
         setTable();
         addListeners();
-//        tblSalary.setRowSelectionAllowed(true);
         fillComboFireman();
     }
     
@@ -48,11 +42,18 @@ public class GUI_Secretary extends javax.swing.JFrame {
         jPanel1.setBackground(Color.WHITE);
         jPanel2.setBackground(Color.WHITE);
         cmbFiremen.setBackground(Color.WHITE);
-        
+        lblImage.setBackground(Color.WHITE);    
     }
+     
+     private void addImage(){
+        imageLogo = new ImageIcon("ebr.jpg");
+        Image newimg = imageLogo.getImage().getScaledInstance(250, 50, java.awt.Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(newimg);
+        lblImage.setIcon(newIcon);
+     }
 
     private void fillComboFireman() {
-        cmbFiremen.addItem("vælg Brandmand");
+        cmbFiremen.addItem(MessageDialog.getInstance().cmbFireman());
         for (BEFireman be : BLLSecretary.getInstance().readAllFiremen()) {
             cmbFiremen.addItem(be);
         }
@@ -60,11 +61,9 @@ public class GUI_Secretary extends javax.swing.JFrame {
 
     private void addListeners() {
         btnAction btn = new btnAction();
-        mouseAction click = new mouseAction();
         btnSearch.addActionListener(btn);
         btnPrint.addActionListener(btn);
         btnUsage.addActionListener(btn);
-        tblSalary.addMouseListener(click);
 
     }
 
@@ -85,25 +84,29 @@ public class GUI_Secretary extends javax.swing.JFrame {
             salaryModel = new TableModelSalary(salary);
         }
         tblSalary.setModel(salaryModel);
-        sorter = new TableRowSorter<>(salaryModel);
-        tblSalary.setRowSorter(sorter);
 
     }
 
     private void onClickSearch() {
-        searchForFiremen();
+        if(((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty() || ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty()){
+            MessageDialog.getInstance().selectDatesText();
+        }else{
+            searchForFiremen();
+        }
+        
     }
 
     private void onClickPrintFireman(BEFireman befireman, String from, String to) {
 
         if (!salary.isEmpty()) {
-            BLLSecretary.getInstance().sendToPdfFireman(salary, befireman, from, to);
+            BLLPDFCreator.getInstance().printPDFFireman(salary, befireman, from, to);
+
         }
     }
 
     private void onClickPrintRooster(String from, String to) {
         if (!salary.isEmpty()) {
-            BLLSecretary.getInstance().sendToPdfRooster(salary, from, to);
+            BLLPDFCreator.getInstance().printPDFRooster(salary, from, to);
     
         }
     }
@@ -113,18 +116,7 @@ public class GUI_Secretary extends javax.swing.JFrame {
         guiUsage.setVisible(true);
     }
 
-    private void onMoucseClick() {
-       
-        if (tblSalary.getSelectedRow() != -1) {
-            int idx = tblSalary.getSelectedRow();
-            int modelRow = sorter.convertRowIndexToModel(idx);
-            //tblSalary.convertRowIndexToModel(idx);
-            besalary = salaryModel.getSalaryByRow(modelRow);
-
-        } else {
-            besalary = null;
-        }
-    }
+    
 
     private class btnAction implements ActionListener {
 
@@ -148,14 +140,7 @@ public class GUI_Secretary extends javax.swing.JFrame {
         }
     }
 
-    private class mouseAction extends MouseAdapter {
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            onMoucseClick();
-
-        }
-    }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -173,6 +158,7 @@ public class GUI_Secretary extends javax.swing.JFrame {
         btnPrint = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         cmbFiremen = new javax.swing.JComboBox();
+        lblImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -222,6 +208,8 @@ public class GUI_Secretary extends javax.swing.JFrame {
         jPanel2.add(cmbFiremen);
         cmbFiremen.setBounds(20, 30, 200, 22);
 
+        lblImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -233,31 +221,37 @@ public class GUI_Secretary extends javax.swing.JFrame {
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(270, 270, 270)
-                        .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1050, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(960, 960, 960)
+                        .addGap(830, 830, 830)
+                        .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
                         .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addGap(23, 23, 23))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(5, 5, 5)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
-                .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         pack();
@@ -274,6 +268,7 @@ public class GUI_Secretary extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblImage;
     private javax.swing.JTable tblSalary;
     // End of variables declaration//GEN-END:variables
 }

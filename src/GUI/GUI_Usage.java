@@ -2,6 +2,7 @@ package GUI;
 
 import BE.BEIncident;
 import BE.BEUsage;
+import BLL.BLLPDFCreator;
 import BLL.BLLSecretary;
 import GUI.TableModel.TableModelIncident;
 import GUI.TableModel.TableModelSalary;
@@ -13,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Date;
 import java.util.ArrayList;
+import javax.swing.JTextField;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.table.TableRowSorter;
 
@@ -30,7 +32,7 @@ public class GUI_Usage extends javax.swing.JFrame {
     public GUI_Usage() {
         initComponents();
         initializeSettings();
-        
+
     }
 
     private void initializeSettings() {
@@ -39,13 +41,13 @@ public class GUI_Usage extends javax.swing.JFrame {
         setTable();
         addListeners();
     }
-    
-     private void addColors() {
+
+    private void addColors() {
         this.getContentPane().setBackground(Color.WHITE);
         jPanel1.setBackground(Color.WHITE);
         jPanel2.setBackground(Color.WHITE);
-        
-        
+
+
     }
 
     private void addListeners() {
@@ -65,25 +67,29 @@ public class GUI_Usage extends javax.swing.JFrame {
     }
 
     private void onClickSearch() {
-
-        java.util.Date utilDateFrom = dateChooserFrom.getDate();
-        java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
-        java.util.Date utilDateTo = dateChooserTo.getDate();
-        java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
-        incident = BLLSecretary.getInstance().sortIncidents(from, to);
-        incidentModel = new TableModelIncident(incident);
-        tblIncident.setModel(incidentModel);
-        sorter = new TableRowSorter<>(incidentModel);
-        tblIncident.setRowSorter(sorter);
+        if (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty() || ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty()) {
+            MessageDialog.getInstance().selectDatesText();
+        } else {
+            java.util.Date utilDateFrom = dateChooserFrom.getDate();
+            java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
+            java.util.Date utilDateTo = dateChooserTo.getDate();
+            java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
+            incident = BLLSecretary.getInstance().sortIncidents(from, to);
+            incidentModel = new TableModelIncident(incident);
+            tblIncident.setModel(incidentModel);
+            sorter = new TableRowSorter<>(incidentModel);
+            tblIncident.setRowSorter(sorter);
+        }
     }
-    
-    private void onClickPrint(){
-        if(tblIncident.getSelectedRow() != -1){
+
+    private void onClickPrint() {
+        if (tblIncident.getSelectedRow() != -1) {
             int idx = tblIncident.getSelectedRow();
             int modelRow = sorter.convertRowIndexToModel(idx);
             //tblSalary.convertRowIndexToModel(idx);
             beincident = incidentModel.getIncidentByRow(modelRow);
-            BLLSecretary.getInstance().sendToPdfUsage(usage, beincident);
+            BLLPDFCreator.getInstance().printPdfUsage(BLLSecretary.getInstance().sortIncidentDetails(beincident), beincident, usage);
+
         }
     }
 
@@ -113,11 +119,12 @@ public class GUI_Usage extends javax.swing.JFrame {
             if (e.getSource().equals(btnSearch)) {
                 onClickSearch();
             }
-            if(e.getSource().equals(btnPrint)){
+            if (e.getSource().equals(btnPrint)) {
                 onClickPrint();
             }
-            if(e.getSource().equals(btnOk))
+            if (e.getSource().equals(btnOk)) {
                 dispose();
+            }
         }
     }
 
