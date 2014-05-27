@@ -52,7 +52,7 @@ public class DALRead {
                 + "inner join Incident on [Role/Time].incidentId = Incident.id \n"
                 + "inner join IncidentType on Incident.incidentTypeId = IncidentType.id\n"
                 + "inner join [Role] on [Role/Time].roleId = [Role].id\n"
-                + "where Incident.date >= ? and Incident.date <= ?\n"
+                + "where Incident.date >= ? and Incident.date <= ? and Incident.isDone = 1\n"
                 + "order by lastname, firstname, date";
 
         PreparedStatement ps = m_connection.prepareStatement(sql);
@@ -153,7 +153,7 @@ public class DALRead {
     public ArrayList<BEIncident> readIncidents() throws SQLException {
         ArrayList<BEIncident> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
-        stm.execute("select * from Incident");
+        stm.execute("select * from Incident where Incident.isDone = 1");
         ResultSet result = stm.getResultSet();
         while (result.next()) {
             int id = result.getInt("id");
@@ -188,7 +188,8 @@ public class DALRead {
                 + "IncidentDetails.detectorNumber,"
                 + "IncidentDetails.groupNumber "
                 + "from IncidentDetails inner join Incident "
-                + "on IncidentDetails.incidentId = incident.id ");
+                + "on IncidentDetails.incidentId = incident.id "
+                + "where Incident.isDone = 1 ");
         ResultSet result = stm.getResultSet();
         while (result.next()) {
             String incidentLeader = result.getString("incidentLeader");
