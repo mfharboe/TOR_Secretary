@@ -32,9 +32,14 @@ public class MessageDialog implements IObserver{
     public void selectDatesText(){
         JOptionPane.showMessageDialog(null, "Vælg fra og til dato");
     }
+    public void reverseDatesText(){
+        JOptionPane.showMessageDialog(null, "Kan ikke vælge dato til der er før end dato fra og omvendt");
+    }
     
+    public void printedConfirmMessage(){
+        JOptionPane.showMessageDialog(null, "Rapport oprettet");
+    }
     
-
     @Override
     public void update(String error) {
         JOptionPane.showMessageDialog(null, error);

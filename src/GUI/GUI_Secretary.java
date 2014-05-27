@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 
-
 public class GUI_Secretary extends javax.swing.JFrame {
 
     private TableModelSalary salaryModel;
@@ -24,7 +23,7 @@ public class GUI_Secretary extends javax.swing.JFrame {
 
     public GUI_Secretary() {
         BLLError.getInstance().register(MessageDialog.getInstance());
-        initComponents();        
+        initComponents();
         initializeSettings();
 
     }
@@ -36,21 +35,21 @@ public class GUI_Secretary extends javax.swing.JFrame {
         addListeners();
         fillComboFireman();
     }
-    
-     private void addColors() {
+
+    private void addColors() {
         this.getContentPane().setBackground(Color.WHITE);
         jPanel1.setBackground(Color.WHITE);
         jPanel2.setBackground(Color.WHITE);
         cmbFiremen.setBackground(Color.WHITE);
-        lblImage.setBackground(Color.WHITE);    
+        lblImage.setBackground(Color.WHITE);
     }
-     
-     private void addImage(){
+
+    private void addImage() {
         imageLogo = new ImageIcon("ebr.jpg");
         Image newimg = imageLogo.getImage().getScaledInstance(250, 50, java.awt.Image.SCALE_SMOOTH);
         ImageIcon newIcon = new ImageIcon(newimg);
         lblImage.setIcon(newIcon);
-     }
+    }
 
     private void fillComboFireman() {
         cmbFiremen.addItem(MessageDialog.getInstance().cmbFireman());
@@ -88,18 +87,25 @@ public class GUI_Secretary extends javax.swing.JFrame {
     }
 
     private void onClickSearch() {
-        if(((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty() || ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty()){
+        boolean isEmpty1 = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
+        boolean isEmpty2 = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
+        if (!(isEmpty1 || isEmpty2)) {
+            if (!dateChooserTo.getDate().before(dateChooserFrom.getDate())) {
+                searchForFiremen();
+            }else{
+                MessageDialog.getInstance().reverseDatesText();
+            }
+        } else {
             MessageDialog.getInstance().selectDatesText();
-        }else{
-            searchForFiremen();
         }
-        
+
     }
 
     private void onClickPrintFireman(BEFireman befireman, String from, String to) {
 
         if (!salary.isEmpty()) {
             BLLPDFCreator.getInstance().printPDFFireman(salary, befireman, from, to);
+            MessageDialog.getInstance().printedConfirmMessage();
 
         }
     }
@@ -107,16 +113,15 @@ public class GUI_Secretary extends javax.swing.JFrame {
     private void onClickPrintRooster(String from, String to) {
         if (!salary.isEmpty()) {
             BLLPDFCreator.getInstance().printPDFRooster(salary, from, to);
-    
+            MessageDialog.getInstance().printedConfirmMessage();
+
         }
     }
-    
-    private void onClickUsage(){
+
+    private void onClickUsage() {
         GUI_Usage guiUsage = new GUI_Usage();
         guiUsage.setVisible(true);
     }
-
-    
 
     private class btnAction implements ActionListener {
 
@@ -129,18 +134,17 @@ public class GUI_Secretary extends javax.swing.JFrame {
                 String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
                 String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
                 if (cmbFiremen.getSelectedIndex() != 0) {
-                BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
+                    BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
                     onClickPrintFireman(befireman, from, to);
-                } else if(cmbFiremen.getSelectedIndex() == 0) {
+                } else if (cmbFiremen.getSelectedIndex() == 0) {
                     onClickPrintRooster(from, to);
                 }
             }
-            if(e.getSource().equals(btnUsage))
+            if (e.getSource().equals(btnUsage)) {
                 onClickUsage();
+            }
         }
     }
-
-    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

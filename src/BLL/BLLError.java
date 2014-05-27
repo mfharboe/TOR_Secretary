@@ -12,69 +12,69 @@ import java.util.ArrayList;
  *
  * @author Morten
  */
-public class BLLError implements ISubject{
-    
+public class BLLError implements ISubject {
+
     private static BLLError m_instance;
     private String error;
     private ArrayList<IObserver> observers;
-    
-    private BLLError(){
+
+    private BLLError() {
         observers = new ArrayList<>();
-        
+
     }
-    
-    public static BLLError getInstance(){
-        if(m_instance == null){
+
+    public static BLLError getInstance() {
+        if (m_instance == null) {
             m_instance = new BLLError();
         }
         return m_instance;
     }
-    
-    public void dbError(){
+
+    public void dbError() {
         error = "Der er sket en fejl, handlingen afsluttes";
-        notifyObservers();    
+        notifyObservers();
     }
-    public void readIncidentError(){
+
+    public void readIncidentError() {
         error = "Kunne ikke læse indsatser";
         notifyObservers();
     }
-    
-    public void readSalaryError(){
+
+    public void readSalaryError() {
         error = "Kunne ikke indlæse tids rapport";
         notifyObservers();
     }
-    
-    public void readFiremanError(){
+
+    public void readFiremanError() {
         error = "Kunne ikke indlæse Brandmænd";
         notifyObservers();
     }
-    
-    public void readUsageError(){
+
+    public void readUsageError() {
         error = "Kunne ikke indlæse forbrug";
         notifyObservers();
     }
-    
-    public void readIncidentDetailsError(){
+
+    public void readIncidentDetailsError() {
         error = "Kunne ikke indlæse indsats detaljer";
         notifyObservers();
     }
 
     @Override
     public void register(IObserver o) {
-    observers.add(o);
+        observers.add(o);
     }
 
     @Override
     public void unregister(IObserver o) {
-       observers.remove(o);}
+        observers.remove(o);
+    }
 
     @Override
     public void notifyObservers() {
-        for(IObserver observer : observers){
+        for (IObserver observer : observers) {
             observer.update(error);
-            
+
         }
-}
-    
-    
+    }
 }

@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +42,7 @@ public class BLLPDFCreator {
     Image image1;
 
     private BLLPDFCreator() {
+         
         
     }
 
@@ -51,6 +53,24 @@ public class BLLPDFCreator {
         return m_instance;
 
     }
+    
+    public String getMyDate(){
+        Date date = new Date();
+            int dayInt = date.getDate();
+            String dayString = dayInt + "";
+            if (dayInt < 10) {
+                dayString = "0" + dayString;
+            }
+            int monthInt = date.getMonth() + 1;
+            String monthString = monthInt + "";
+            if (monthInt < 10) {
+                monthString = "0" + monthString;
+            }
+            String myDate = (date.getYear() + 1900) + "-" + monthString + "-" + dayString;
+            return myDate;
+    }
+    
+    
 
     public void printPDFFireman(ArrayList<BESalary> salarys, BEFireman befireman, String from, String to) {
         Document document = new Document();
@@ -59,6 +79,8 @@ public class BLLPDFCreator {
             PdfWriter.getInstance(document,
                     new FileOutputStream(salarys.get(0).getM_lastName() + ", " + salarys.get(0).getM_firstName() + " " + from + " - " + to + ".pdf"));
 
+           
+            
             document.open();
             
             try {
@@ -72,7 +94,10 @@ public class BLLPDFCreator {
             }
             image1.setAlignment(Element.ALIGN_RIGHT);
             image1.scalePercent(50);
+            document.add(new Paragraph("Udskrevet den : " + getMyDate()));
             document.add(image1);
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
             document.add(new Phrase("Navn : " + salarys.get(0).getM_lastName() + ", "));
             document.add(new Phrase(salarys.get(0).getM_firstName() + " "));
             document.add(new Paragraph("Addresse : " + befireman.getM_address() + ", " + befireman.getM_zipCode().getM_city() + " " + befireman.getM_zipCode().getM_zipCode()));
@@ -233,8 +258,10 @@ public class BLLPDFCreator {
             }
             image1.setAlignment(Element.ALIGN_RIGHT);
             image1.scalePercent(50);
+            document.add(new Paragraph("Udskrevet den : " + getMyDate()));
             document.add(image1);
-            
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
             document.add(new Paragraph("Dato: Fra " + from + " Til " + to));
             document.add(new Paragraph(" "));
 
@@ -317,6 +344,7 @@ public class BLLPDFCreator {
             }
             image1.setAlignment(Element.ALIGN_RIGHT);
             image1.scalePercent(50);
+            document.add(new Paragraph("Udskrevet den : " + getMyDate()));
             document.add(image1);
             Paragraph paragraphDate = new Paragraph("Dato : " + beincident.getM_date());
 

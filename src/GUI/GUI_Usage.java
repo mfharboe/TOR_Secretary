@@ -67,18 +67,24 @@ public class GUI_Usage extends javax.swing.JFrame {
     }
 
     private void onClickSearch() {
-        if (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty() || ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty()) {
-            MessageDialog.getInstance().selectDatesText();
+        boolean isEmpty1 = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
+        boolean isEmpty2 = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
+        if (!(isEmpty1 || isEmpty2)) {
+            if (!dateChooserTo.getDate().before(dateChooserFrom.getDate())) {
+                java.util.Date utilDateFrom = dateChooserFrom.getDate();
+                java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
+                java.util.Date utilDateTo = dateChooserTo.getDate();
+                java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
+                incident = BLLSecretary.getInstance().sortIncidents(from, to);
+                incidentModel = new TableModelIncident(incident);
+                tblIncident.setModel(incidentModel);
+                sorter = new TableRowSorter<>(incidentModel);
+                tblIncident.setRowSorter(sorter);
+            } else {
+                MessageDialog.getInstance().reverseDatesText();
+            }
         } else {
-            java.util.Date utilDateFrom = dateChooserFrom.getDate();
-            java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
-            java.util.Date utilDateTo = dateChooserTo.getDate();
-            java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
-            incident = BLLSecretary.getInstance().sortIncidents(from, to);
-            incidentModel = new TableModelIncident(incident);
-            tblIncident.setModel(incidentModel);
-            sorter = new TableRowSorter<>(incidentModel);
-            tblIncident.setRowSorter(sorter);
+            MessageDialog.getInstance().selectDatesText();
         }
     }
 
@@ -89,6 +95,7 @@ public class GUI_Usage extends javax.swing.JFrame {
             //tblSalary.convertRowIndexToModel(idx);
             beincident = incidentModel.getIncidentByRow(modelRow);
             BLLPDFCreator.getInstance().printPdfUsage(BLLSecretary.getInstance().sortIncidentDetails(beincident), beincident, usage);
+            MessageDialog.getInstance().printedConfirmMessage();
 
         }
     }
@@ -100,7 +107,12 @@ public class GUI_Usage extends javax.swing.JFrame {
             //tblSalary.convertRowIndexToModel(idx);
             beincident = incidentModel.getIncidentByRow(modelRow);
             txtIncidentName.setText(beincident.getM_incidentName());
-            txtAlarm.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm().getM_description());
+            if (BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm() == null) {
+                txtAlarm.setText("");
+            } else {
+                txtAlarm.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm().getM_description());
+
+            }
             txtDetectorNumber.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_detectorNumber());
             txtGroupNumber.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_groupNumber());
             usage = BLLSecretary.getInstance().sortUsages(beincident);
