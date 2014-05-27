@@ -13,6 +13,7 @@ import BE.BEMaterial;
 import BE.BEUsage;
 import BE.BESalary;
 import BE.BEZipcode;
+import DAL.Interfaces.IDALRead;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
  *
  * @author Morten
  */
-public class DALRead {
+public class DALRead implements IDALRead {
 
     Connection m_connection;
     private static DALRead m_instance;
@@ -36,14 +37,24 @@ public class DALRead {
     private DALRead() {
         m_connection = DB_Connection.getInstance().getConnection();
     }
-
+/**
+ * 
+ * @return current instance of DALRead
+ */
     public static DALRead getInstance() {
         if (m_instance == null) {
             m_instance = new DALRead();
         }
         return m_instance;
     }
-
+/**
+ * Read all Salary info from DB where incident is done
+ * @param from
+ * @param to
+ * @return Arraylist of salaries
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BESalary> readInfo(String from, String to) throws SQLException {
         ArrayList<BESalary> res = new ArrayList<>();
         String sql = "Select Fireman.lastName, Fireman.firstName,Incident.incidentName, Incident.[date], IncidentType.incidentTypeDescription, [Role].roleDescription,[Role/Time].[hours] \n"
@@ -75,7 +86,12 @@ public class DALRead {
         }
         return res;
     }
-
+/**
+ * Read all firemen from DB
+ * @return Arraylist of firemen
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEFireman> readFiremen() throws SQLException {
         ArrayList<BEFireman> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -103,7 +119,12 @@ public class DALRead {
         }
         return res;
     }
-
+/**
+ * Read all zipcodes from DB
+ * @return Arraylist if zipcodes
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEZipcode> readZipcodes() throws SQLException {
         ArrayList<BEZipcode> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -117,7 +138,12 @@ public class DALRead {
         }
         return res;
     }
-
+/**
+ * Read all incident types from DB
+ * @return Arraylists of incidentTypes
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEIncidentType> readIncidentTypes() throws SQLException {
         if (resIncidentType == null) {
             resIncidentType = new ArrayList<>();
@@ -133,7 +159,12 @@ public class DALRead {
         }
         return resIncidentType;
     }
-
+/**
+ * Read all alarms from DB
+ * @return Arraylist of alarms
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEAlarm> readAlarms() throws SQLException {
         if (resAlarms == null) {
             resAlarms = new ArrayList<>();
@@ -149,7 +180,12 @@ public class DALRead {
         }
         return resAlarms;
     }
-
+/**
+ * Read incidents from DB that is done
+ * @return Arraylist of incidents
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEIncident> readIncidents() throws SQLException {
         ArrayList<BEIncident> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -173,7 +209,12 @@ public class DALRead {
         }
         return res;
     }
-
+/**
+ * Read all incidents Detaisl where incident is done
+ * @return Arraylist of incidentDetails
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEIncidentDetails> readIncidentDetails() throws SQLException {
         ArrayList<BEIncidentDetails> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -235,7 +276,12 @@ public class DALRead {
         return res;
 
     }
-
+/**
+ * Read all usages from DB
+ * @return Arraylist of usages
+ * @throws SQLException 
+ */
+    @Override
     public ArrayList<BEUsage> readUsage() throws SQLException {
         ArrayList<BEUsage> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();
@@ -269,11 +315,12 @@ public class DALRead {
     }
 
     /**
-     * Creates an ArrayList of Material
+     * Read all material from DB
      *
      * @return ArrayList of Material
      * @throws SQLException
      */
+    @Override
     public ArrayList<BEMaterial> readMaterial() throws SQLException {
         ArrayList<BEMaterial> res = new ArrayList<>();
         Statement stm = m_connection.createStatement();

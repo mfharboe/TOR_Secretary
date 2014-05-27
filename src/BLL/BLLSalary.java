@@ -11,6 +11,7 @@ import BE.BEUsage;
 
 import BE.BESalary;
 import DAL.DALRead;
+import DAL.Interfaces.IDALRead;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,43 +22,68 @@ import java.util.logging.Logger;
  *
  * @author Morten
  */
-public class BLLSecretary {
+public class BLLSalary {
 
-    private static BLLSecretary m_instance;
+    private static BLLSalary m_instance;
     ArrayList<BESalary> salaries = new ArrayList<>();
     ArrayList<BEFireman> firemen;
     ArrayList<BEIncidentDetails> incidentDetails;
     ArrayList<BEUsage> usage;
     ArrayList<BEIncident> incidents;
-
-    private BLLSecretary() {
+    IDALRead dalRead;
+/**
+ * Creates a private form of BLLSalary
+ */
+    private BLLSalary() {
     }
-
-    public static BLLSecretary getInstance() {
+/**
+ * 
+ * @return Current instance of BLLSalary 
+ */
+    public static BLLSalary getInstance() {
         if (m_instance == null) {
-            m_instance = new BLLSecretary();
+            m_instance = new BLLSalary();
         }
         return m_instance;
 
     }
-
+    /**
+     * Sets which interface should be used
+     * @param d 
+     */
+    public void setDAL(IDALRead d){
+        dalRead = d;
+        
+    }
+/**
+ * Read salaries in time a specific time period 
+ * @param from
+ * @param to
+ * @return 
+ */
     public ArrayList<BESalary> readSalariesInTimePeriod(String from, String to) {
 
         try {
-            salaries = DALRead.getInstance().readInfo(from, to);
+            salaries = dalRead.readInfo(from, to);
         } catch (SQLException ex) {
             BLLError.getInstance().readSalaryError();
         }
         return salaries;
 
     }
-
+/**
+ *  Read salaries in time a specific time period with a specific fireman
+ * @param fireman
+ * @param from
+ * @param to
+ * @return 
+ */
     public ArrayList<BESalary> readSalariesInTimePeriodWithFiremen(BEFireman fireman, String from, String to) {
         try {
             ArrayList<BESalary> besalary = new ArrayList<>();
             ArrayList<BESalary> info = new ArrayList<>();
 
-            info = DALRead.getInstance().readInfo(from, to);
+            info = dalRead.readInfo(from, to);
             for (BESalary be : info) {
                 if (fireman != null
                         && fireman.getM_lastName().equals(be.getM_lastName())
@@ -75,11 +101,14 @@ public class BLLSecretary {
         return null;
 
     }
-
+/**
+ * Reads all firemen
+ * @return Arraylist firemen
+ */
     public ArrayList<BEFireman> readAllFiremen() {
         if (firemen == null) {
             try {
-                firemen = DALRead.getInstance().readFiremen();
+                firemen = dalRead.readFiremen();
             } catch (SQLException ex) {
                 BLLError.getInstance().readFiremanError();
                 return null;
@@ -88,11 +117,14 @@ public class BLLSecretary {
         return firemen;
     }
 
-    
+    /**
+     * Reads all incidents
+     * @return Arraylists incidents
+     */
     public ArrayList<BEIncident> readIncidents(){
         if(incidents == null){
             try {
-                incidents = DALRead.getInstance().readIncidents();
+                incidents = dalRead.readIncidents();
             } catch (SQLException ex) {
                 BLLError.getInstance().readIncidentError();
                 return null;
@@ -101,7 +133,12 @@ public class BLLSecretary {
         return incidents;
         
     }
-
+/**
+ * Sort incidents by dates
+ * @param from
+ * @param to
+ * @return ArrayList incidentSorted
+ */
     public ArrayList<BEIncident> sortIncidents(Date from, Date to) {
         ArrayList<BEIncident> incidentsSorted = new ArrayList<>();
        
@@ -114,18 +151,25 @@ public class BLLSecretary {
       
         return incidentsSorted;
     }
-
+/**
+ * Read usages
+ * @return Arraylists usage
+ */
     public ArrayList<BEUsage> readUsages() {
         if (usage == null) {
             try {
-                usage = DALRead.getInstance().readUsage();
+                usage = dalRead.readUsage();
             } catch (SQLException ex) {
                BLLError.getInstance().readUsageError();
             }
         }
         return usage;
     }
-
+/**
+ * Sort usages by incident
+ * @param beincident
+ * @return Arraylist usagesorted
+ */
     public ArrayList<BEUsage> sortUsages(BEIncident beincident) {
         ArrayList<BEUsage> usagesorted = new ArrayList<>();
 
@@ -138,18 +182,25 @@ public class BLLSecretary {
         return usagesorted;
 
     }
-
+/**
+ * Read all incident details
+ * @return Arraylist incidentDetails
+ */
     public ArrayList<BEIncidentDetails> readIncidentDetails() {
         if (incidentDetails == null) {
             try {
-                incidentDetails = DALRead.getInstance().readIncidentDetails();
+                incidentDetails = dalRead.readIncidentDetails();
             } catch (SQLException ex) {
                BLLError.getInstance().readIncidentDetailsError();
             }
         }
         return incidentDetails;
     }
-
+/**
+ * Sort incident details by incident
+ * @param beincident
+ * @return sortedIncidentDetails
+ */
     public ArrayList<BEIncidentDetails> sortIncidentDetails(BEIncident beincident) {
         ArrayList<BEIncidentDetails> sortedIncidentDetails = new ArrayList<>();
         for (BEIncidentDetails beincidentDetails : readIncidentDetails()) {

@@ -27,10 +27,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
+
 
 /**
  *
@@ -40,12 +39,16 @@ public class BLLPDFCreator {
 
     private static BLLPDFCreator m_instance;
     Image image1;
-
+/**
+ * Creates a private from of BLLPDFCreator
+ */
     private BLLPDFCreator() {
-         
-        
+     
     }
-
+/**
+ * 
+ * @return current instance of BLLPDFCreater
+ */
     public static BLLPDFCreator getInstance() {
         if (m_instance == null) {
             m_instance = new BLLPDFCreator();
@@ -53,7 +56,10 @@ public class BLLPDFCreator {
         return m_instance;
 
     }
-    
+    /**
+     * 
+     * @return current date
+     */
     public String getMyDate(){
         Date date = new Date();
             int dayInt = date.getDate();
@@ -71,7 +77,13 @@ public class BLLPDFCreator {
     }
     
     
-
+/**
+ * Prints a salary per fireman report to pdf
+ * @param salarys
+ * @param befireman
+ * @param from
+ * @param to 
+ */
     public void printPDFFireman(ArrayList<BESalary> salarys, BEFireman befireman, String from, String to) {
         Document document = new Document();
         try {
@@ -237,7 +249,12 @@ public class BLLPDFCreator {
         }
 
     }
-
+/**
+ * Prints a salary report per rooster
+ * @param be
+ * @param from
+ * @param to 
+ */
     public void printPDFRooster(ArrayList<BESalary> be, String from, String to) {
         Document document = new Document();
         try {
@@ -324,7 +341,12 @@ public class BLLPDFCreator {
         }
 
     }
-
+/**
+ * Print a usage report per incident
+ * @param beIncidentDetails
+ * @param beincident
+ * @param usage 
+ */
     public void printPdfUsage(ArrayList<BEIncidentDetails> beIncidentDetails, BEIncident beincident, ArrayList<BEUsage> usage) {
         Document document = new Document();
         try {

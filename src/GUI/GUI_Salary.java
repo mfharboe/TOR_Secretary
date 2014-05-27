@@ -4,7 +4,8 @@ import BE.BEFireman;
 import BE.BESalary;
 import BLL.BLLError;
 import BLL.BLLPDFCreator;
-import BLL.BLLSecretary;
+import BLL.BLLSalary;
+import DAL.DALRead;
 import GUI.TableModel.TableModelSalary;
 import java.awt.Color;
 import java.awt.Image;
@@ -14,20 +15,25 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 
-public class GUI_Secretary extends javax.swing.JFrame {
+public class GUI_Salary extends javax.swing.JFrame {
 
     private TableModelSalary salaryModel;
     private final ArrayList<BESalary> EMPTY_ARRAY_LIST = new ArrayList<>();
     ArrayList<BESalary> salary = new ArrayList<>();
     ImageIcon imageLogo;
-
-    public GUI_Secretary() {
+/**
+ * Creates a new form GUI_Salary
+ */
+    public GUI_Salary() {
+        BLLSalary.getInstance().setDAL(DALRead.getInstance());
         BLLError.getInstance().register(MessageDialog.getInstance());
         initComponents();
         initializeSettings();
 
     }
-
+/**
+ * The initial setting for this class
+ */
     private void initializeSettings() {
         addColors();
         addImage();
@@ -35,7 +41,9 @@ public class GUI_Secretary extends javax.swing.JFrame {
         addListeners();
         fillComboFireman();
     }
-
+/**
+ * Adjust color of GUI
+ */
     private void addColors() {
         this.getContentPane().setBackground(Color.WHITE);
         jPanel1.setBackground(Color.WHITE);
@@ -43,21 +51,27 @@ public class GUI_Secretary extends javax.swing.JFrame {
         cmbFiremen.setBackground(Color.WHITE);
         lblImage.setBackground(Color.WHITE);
     }
-
+/**
+ * Adds a logo in the GUI
+ */
     private void addImage() {
         imageLogo = new ImageIcon("ebr.jpg");
         Image newimg = imageLogo.getImage().getScaledInstance(250, 50, java.awt.Image.SCALE_SMOOTH);
         ImageIcon newIcon = new ImageIcon(newimg);
         lblImage.setIcon(newIcon);
     }
-
+/**
+ * Fills the Fireman ComboBox
+ */
     private void fillComboFireman() {
         cmbFiremen.addItem(MessageDialog.getInstance().cmbFireman());
-        for (BEFireman be : BLLSecretary.getInstance().readAllFiremen()) {
+        for (BEFireman be : BLLSalary.getInstance().readAllFiremen()) {
             cmbFiremen.addItem(be);
         }
     }
-
+/**
+ * Adds listeners to the class
+ */
     private void addListeners() {
         btnAction btn = new btnAction();
         btnSearch.addActionListener(btn);
@@ -65,27 +79,33 @@ public class GUI_Secretary extends javax.swing.JFrame {
         btnUsage.addActionListener(btn);
 
     }
-
+/**
+ * Sets the initial tablemodel
+ */
     private void setTable() {
         salaryModel = new TableModelSalary(EMPTY_ARRAY_LIST);
         tblSalary.setModel(salaryModel);
     }
-
+/**
+ * Searches for Firemen
+ */
     private void searchForFiremen() {
         String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
         String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
         if (cmbFiremen.getSelectedIndex() != 0) {
             BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
-            salary = BLLSecretary.getInstance().readSalariesInTimePeriodWithFiremen(befireman, from, to);
+            salary = BLLSalary.getInstance().readSalariesInTimePeriodWithFiremen(befireman, from, to);
             salaryModel = new TableModelSalary(salary);
         } else {
-            salary = BLLSecretary.getInstance().readSalariesInTimePeriod(from, to);
+            salary = BLLSalary.getInstance().readSalariesInTimePeriod(from, to);
             salaryModel = new TableModelSalary(salary);
         }
         tblSalary.setModel(salaryModel);
 
     }
-
+/**
+ * Determines what happens when you cick the search button
+ */
     private void onClickSearch() {
         boolean isEmpty1 = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
         boolean isEmpty2 = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
@@ -100,7 +120,12 @@ public class GUI_Secretary extends javax.swing.JFrame {
         }
 
     }
-
+/**
+ * Send relevant fireman information to PDF Creator class.
+ * @param befireman
+ * @param from
+ * @param to 
+ */
     private void onClickPrintFireman(BEFireman befireman, String from, String to) {
 
         if (!salary.isEmpty()) {
@@ -109,7 +134,11 @@ public class GUI_Secretary extends javax.swing.JFrame {
 
         }
     }
-
+/**
+ * Send relevant incident information to PDF Creator class
+ * @param from
+ * @param to 
+ */
     private void onClickPrintRooster(String from, String to) {
         if (!salary.isEmpty()) {
             BLLPDFCreator.getInstance().printPDFRooster(salary, from, to);
@@ -117,12 +146,16 @@ public class GUI_Secretary extends javax.swing.JFrame {
 
         }
     }
-
+/**
+ * Open a new instance of GUI_Usage
+ */
     private void onClickUsage() {
         GUI_Usage guiUsage = new GUI_Usage();
         guiUsage.setVisible(true);
     }
-
+/**
+ * Listener for the buttons
+ */
     private class btnAction implements ActionListener {
 
         @Override

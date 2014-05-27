@@ -3,7 +3,7 @@ package GUI;
 import BE.BEIncident;
 import BE.BEUsage;
 import BLL.BLLPDFCreator;
-import BLL.BLLSecretary;
+import BLL.BLLSalary;
 import GUI.TableModel.TableModelIncident;
 import GUI.TableModel.TableModelSalary;
 import GUI.TableModel.TableModelUsage;
@@ -28,20 +28,26 @@ public class GUI_Usage extends javax.swing.JFrame {
     ArrayList<BEUsage> usage = new ArrayList<>();
     TableRowSorter<TableModelIncident> sorter;
     BEIncident beincident;
-
+/**
+ * Creates a new form of GUI_Usage
+ */
     public GUI_Usage() {
         initComponents();
         initializeSettings();
 
     }
-
+/**
+ * The initial setting for this class
+ */
     private void initializeSettings() {
         addColors();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTable();
         addListeners();
     }
-
+/**
+ * Adjust color of GUI
+ */
     private void addColors() {
         this.getContentPane().setBackground(Color.WHITE);
         jPanel1.setBackground(Color.WHITE);
@@ -49,7 +55,9 @@ public class GUI_Usage extends javax.swing.JFrame {
 
 
     }
-
+/**
+ * Adds a logo in the GUI
+ */
     private void addListeners() {
         btnAction btn = new btnAction();
         mouseAction click = new mouseAction();
@@ -58,14 +66,18 @@ public class GUI_Usage extends javax.swing.JFrame {
         btnOk.addActionListener(btn);
         tblIncident.addMouseListener(click);
     }
-
+/**
+ * Sets the initial tablemodels
+ */
     private void setTable() {
         incidentModel = new TableModelIncident(EMPTY_ARRAY_LIST_INCIDENT);
         tblIncident.setModel(incidentModel);
         usageModel = new TableModelUsage(EMPTY_ARRAY_LIST_USAGE);
         tblUsage.setModel(usageModel);
     }
-
+/**
+ * Searches for incidents
+ */
     private void onClickSearch() {
         boolean isEmpty1 = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
         boolean isEmpty2 = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
@@ -75,7 +87,7 @@ public class GUI_Usage extends javax.swing.JFrame {
                 java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
                 java.util.Date utilDateTo = dateChooserTo.getDate();
                 java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
-                incident = BLLSecretary.getInstance().sortIncidents(from, to);
+                incident = BLLSalary.getInstance().sortIncidents(from, to);
                 incidentModel = new TableModelIncident(incident);
                 tblIncident.setModel(incidentModel);
                 sorter = new TableRowSorter<>(incidentModel);
@@ -87,19 +99,23 @@ public class GUI_Usage extends javax.swing.JFrame {
             MessageDialog.getInstance().selectDatesText();
         }
     }
-
+/**
+ * send relevant infrmation to pdf creator
+ */
     private void onClickPrint() {
         if (tblIncident.getSelectedRow() != -1) {
             int idx = tblIncident.getSelectedRow();
             int modelRow = sorter.convertRowIndexToModel(idx);
             //tblSalary.convertRowIndexToModel(idx);
             beincident = incidentModel.getIncidentByRow(modelRow);
-            BLLPDFCreator.getInstance().printPdfUsage(BLLSecretary.getInstance().sortIncidentDetails(beincident), beincident, usage);
+            BLLPDFCreator.getInstance().printPdfUsage(BLLSalary.getInstance().sortIncidentDetails(beincident), beincident, usage);
             MessageDialog.getInstance().printedConfirmMessage();
 
         }
     }
-
+/**
+ * determines what happens when you click tableIncident, sends information to tableUsage
+ */
     private void onMouseClick() {
         if (tblIncident.getSelectedRow() != -1) {
             int idx = tblIncident.getSelectedRow();
@@ -107,15 +123,15 @@ public class GUI_Usage extends javax.swing.JFrame {
             //tblSalary.convertRowIndexToModel(idx);
             beincident = incidentModel.getIncidentByRow(modelRow);
             txtIncidentName.setText(beincident.getM_incidentName());
-            if (BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm() == null) {
+            if (BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm() == null) {
                 txtAlarm.setText("");
             } else {
-                txtAlarm.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm().getM_description());
+                txtAlarm.setText(BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm().getM_description());
 
             }
-            txtDetectorNumber.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_detectorNumber());
-            txtGroupNumber.setText(BLLSecretary.getInstance().sortIncidentDetails(beincident).get(0).getM_groupNumber());
-            usage = BLLSecretary.getInstance().sortUsages(beincident);
+            txtDetectorNumber.setText(BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_detectorNumber());
+            txtGroupNumber.setText(BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_groupNumber());
+            usage = BLLSalary.getInstance().sortUsages(beincident);
             usageModel = new TableModelUsage(usage);
             tblUsage.setModel(usageModel);
 
@@ -123,7 +139,9 @@ public class GUI_Usage extends javax.swing.JFrame {
             beincident = null;
         }
     }
-
+/**
+ * Listener for the buttons
+ */
     private class btnAction implements ActionListener {
 
         @Override
@@ -139,7 +157,9 @@ public class GUI_Usage extends javax.swing.JFrame {
             }
         }
     }
-
+/**
+ * Listener for the mouseclick
+ */
     private class mouseAction extends MouseAdapter {
 
         @Override

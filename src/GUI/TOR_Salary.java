@@ -10,13 +10,13 @@ import javax.swing.JFrame;
  *
  * @author Morten
  */
-public class TOR_Secretary {
+public class TOR_Salary {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        JFrame main = new GUI_Secretary();
+        JFrame main = new GUI_Salary();
         main.setVisible(true);
     }
 }
