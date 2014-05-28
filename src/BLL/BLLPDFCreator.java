@@ -223,15 +223,15 @@ public class BLLPDFCreator {
                     totalHours = totalHours + wageTotal.getM_hours();
                 }
 
-                PdfPCell cellO4 = new PdfPCell(new Paragraph("" + totalHours));
 
+
+            }
+                PdfPCell cellO4 = new PdfPCell(new Paragraph("" + totalHours));
                 cellO3.setHorizontalAlignment(Element.ALIGN_CENTER);
                 cellO4.setHorizontalAlignment(Element.ALIGN_CENTER);
 
                 tableOverwiev.addCell(cellO3);
                 tableOverwiev.addCell(cellO4);
-
-            }
 
 
 
