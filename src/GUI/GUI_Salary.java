@@ -129,7 +129,9 @@ public class GUI_Salary extends javax.swing.JFrame {
         }
 
     }
-
+/**
+ * Determines which print method should be used.
+ */
     private void onClickPrint() {
         String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
         String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
