@@ -1,7 +1,9 @@
 package GUI;
 
 import BE.BEIncident;
+import BE.BEIncidentDetails;
 import BE.BEUsage;
+import BLL.BLLAdapter;
 import BLL.BLLPDFCreator;
 import BLL.BLLSalary;
 import GUI.TableModel.TableModelIncident;
@@ -79,15 +81,13 @@ public class GUI_Usage extends javax.swing.JFrame {
  * Searches for incidents
  */
     private void onClickSearch() {
-        boolean isEmpty1 = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
-        boolean isEmpty2 = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
-        if (!(isEmpty1 || isEmpty2)) {
+        boolean isFromEmpty = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
+        boolean isToEmpty = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
+        if (!(isFromEmpty || isToEmpty)) {
             if (!dateChooserTo.getDate().before(dateChooserFrom.getDate())) {
-                java.util.Date utilDateFrom = dateChooserFrom.getDate();
-                java.sql.Date from = new java.sql.Date(utilDateFrom.getTime());
-                java.util.Date utilDateTo = dateChooserTo.getDate();
-                java.sql.Date to = new java.sql.Date(utilDateTo.getTime());
-                incident = BLLSalary.getInstance().sortIncidents(from, to);
+                Date dateFrom = BLLAdapter.getInstance().convertDate(dateChooserFrom.getDate());
+                Date dateTo = BLLAdapter.getInstance().convertDate(dateChooserTo.getDate());
+                incident = BLLSalary.getInstance().sortIncidents(dateFrom, dateTo);
                 incidentModel = new TableModelIncident(incident);
                 tblIncident.setModel(incidentModel);
                 sorter = new TableRowSorter<>(incidentModel);
@@ -120,17 +120,17 @@ public class GUI_Usage extends javax.swing.JFrame {
         if (tblIncident.getSelectedRow() != -1) {
             int idx = tblIncident.getSelectedRow();
             int modelRow = sorter.convertRowIndexToModel(idx);
-            //tblSalary.convertRowIndexToModel(idx);
             beincident = incidentModel.getIncidentByRow(modelRow);
             txtIncidentName.setText(beincident.getM_incidentName());
-            if (BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm() == null) {
+            ArrayList<BEIncidentDetails> sortedIncidentsDetails;
+            sortedIncidentsDetails = BLLSalary.getInstance().sortIncidentDetails(beincident);
+            if (sortedIncidentsDetails.get(0).getM_alarm() == null) {
                 txtAlarm.setText("");
             } else {
-                txtAlarm.setText(BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_alarm().getM_description());
-
+                txtAlarm.setText(sortedIncidentsDetails.get(0).getM_alarm().getM_description());
             }
-            txtDetectorNumber.setText(BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_detectorNumber());
-            txtGroupNumber.setText(BLLSalary.getInstance().sortIncidentDetails(beincident).get(0).getM_groupNumber());
+            txtDetectorNumber.setText(sortedIncidentsDetails.get(0).getM_detectorNumber());
+            txtGroupNumber.setText(sortedIncidentsDetails.get(0).getM_groupNumber());
             usage = BLLSalary.getInstance().sortUsages(beincident);
             usageModel = new TableModelUsage(usage);
             tblUsage.setModel(usageModel);

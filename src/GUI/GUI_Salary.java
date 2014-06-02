@@ -21,9 +21,10 @@ public class GUI_Salary extends javax.swing.JFrame {
     private final ArrayList<BESalary> EMPTY_ARRAY_LIST = new ArrayList<>();
     ArrayList<BESalary> salary = new ArrayList<>();
     ImageIcon imageLogo;
-/**
- * Creates a new form GUI_Salary
- */
+
+    /**
+     * Creates a new form GUI_Salary
+     */
     public GUI_Salary() {
         BLLSalary.getInstance().setDAL(DALRead.getInstance());
         BLLError.getInstance().register(MessageDialog.getInstance());
@@ -31,9 +32,10 @@ public class GUI_Salary extends javax.swing.JFrame {
         initializeSettings();
 
     }
-/**
- * The initial setting for this class
- */
+
+    /**
+     * The initial setting for this class
+     */
     private void initializeSettings() {
         addColors();
         addImage();
@@ -41,9 +43,10 @@ public class GUI_Salary extends javax.swing.JFrame {
         addListeners();
         fillComboFireman();
     }
-/**
- * Adjust color of GUI
- */
+
+    /**
+     * Adjust color of GUI
+     */
     private void addColors() {
         this.getContentPane().setBackground(Color.WHITE);
         jPanel1.setBackground(Color.WHITE);
@@ -51,27 +54,30 @@ public class GUI_Salary extends javax.swing.JFrame {
         cmbFiremen.setBackground(Color.WHITE);
         lblImage.setBackground(Color.WHITE);
     }
-/**
- * Adds a logo in the GUI
- */
+
+    /**
+     * Adds a logo in the GUI
+     */
     private void addImage() {
         imageLogo = new ImageIcon("ebr.jpg");
         Image newimg = imageLogo.getImage().getScaledInstance(250, 50, java.awt.Image.SCALE_SMOOTH);
         ImageIcon newIcon = new ImageIcon(newimg);
         lblImage.setIcon(newIcon);
     }
-/**
- * Fills the Fireman ComboBox
- */
+
+    /**
+     * Fills the Fireman ComboBox
+     */
     private void fillComboFireman() {
         cmbFiremen.addItem(MessageDialog.getInstance().cmbFireman());
         for (BEFireman be : BLLSalary.getInstance().readAllFiremen()) {
             cmbFiremen.addItem(be);
         }
     }
-/**
- * Adds listeners to the class
- */
+
+    /**
+     * Adds listeners to the class
+     */
     private void addListeners() {
         btnAction btn = new btnAction();
         btnSearch.addActionListener(btn);
@@ -79,16 +85,18 @@ public class GUI_Salary extends javax.swing.JFrame {
         btnUsage.addActionListener(btn);
 
     }
-/**
- * Sets the initial tablemodel
- */
+
+    /**
+     * Sets the initial tablemodel
+     */
     private void setTable() {
         salaryModel = new TableModelSalary(EMPTY_ARRAY_LIST);
         tblSalary.setModel(salaryModel);
     }
-/**
- * Searches for Firemen
- */
+
+    /**
+     * Searches for Firemen
+     */
     private void searchForFiremen() {
         String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
         String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
@@ -103,16 +111,17 @@ public class GUI_Salary extends javax.swing.JFrame {
         tblSalary.setModel(salaryModel);
 
     }
-/**
- * Determines what happens when you cick the search button
- */
+
+    /**
+     * Determines what happens when you cick the search button
+     */
     private void onClickSearch() {
         boolean isEmpty1 = ((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText().isEmpty();
         boolean isEmpty2 = ((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText().isEmpty();
         if (!(isEmpty1 || isEmpty2)) {
             if (!dateChooserTo.getDate().before(dateChooserFrom.getDate())) {
                 searchForFiremen();
-            }else{
+            } else {
                 MessageDialog.getInstance().reverseDatesText();
             }
         } else {
@@ -120,12 +129,25 @@ public class GUI_Salary extends javax.swing.JFrame {
         }
 
     }
-/**
- * Send relevant fireman information to PDF Creator class.
- * @param befireman
- * @param from
- * @param to 
- */
+
+    private void onClickPrint() {
+        String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
+        String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
+        if (cmbFiremen.getSelectedIndex() != 0) {
+            BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
+            onClickPrintFireman(befireman, from, to);
+        } else if (cmbFiremen.getSelectedIndex() == 0) {
+            onClickPrintRooster(from, to);
+        }
+    }
+
+    /**
+     * Send relevant fireman information to PDF Creator class.
+     *
+     * @param befireman
+     * @param from
+     * @param to
+     */
     private void onClickPrintFireman(BEFireman befireman, String from, String to) {
 
         if (!salary.isEmpty()) {
@@ -134,11 +156,13 @@ public class GUI_Salary extends javax.swing.JFrame {
 
         }
     }
-/**
- * Send relevant incident information to PDF Creator class
- * @param from
- * @param to 
- */
+
+    /**
+     * Send relevant incident information to PDF Creator class
+     *
+     * @param from
+     * @param to
+     */
     private void onClickPrintRooster(String from, String to) {
         if (!salary.isEmpty()) {
             BLLPDFCreator.getInstance().printPDFRooster(salary, from, to);
@@ -146,16 +170,18 @@ public class GUI_Salary extends javax.swing.JFrame {
 
         }
     }
-/**
- * Open a new instance of GUI_Usage
- */
+
+    /**
+     * Open a new instance of GUI_Usage
+     */
     private void onClickUsage() {
         GUI_Usage guiUsage = new GUI_Usage();
         guiUsage.setVisible(true);
     }
-/**
- * Listener for the buttons
- */
+
+    /**
+     * Listener for the buttons
+     */
     private class btnAction implements ActionListener {
 
         @Override
@@ -164,14 +190,7 @@ public class GUI_Salary extends javax.swing.JFrame {
                 onClickSearch();
             }
             if (e.getSource().equals(btnPrint)) {
-                String from = (((JTextField) dateChooserFrom.getDateEditor().getUiComponent()).getText());
-                String to = (((JTextField) dateChooserTo.getDateEditor().getUiComponent()).getText());
-                if (cmbFiremen.getSelectedIndex() != 0) {
-                    BEFireman befireman = (BEFireman) cmbFiremen.getSelectedItem();
-                    onClickPrintFireman(befireman, from, to);
-                } else if (cmbFiremen.getSelectedIndex() == 0) {
-                    onClickPrintRooster(from, to);
-                }
+                onClickPrint();
             }
             if (e.getSource().equals(btnUsage)) {
                 onClickUsage();
@@ -190,12 +209,12 @@ public class GUI_Salary extends javax.swing.JFrame {
         dateChooserFrom = new com.toedter.calendar.JDateChooser();
         jLabel2 = new javax.swing.JLabel();
         dateChooserTo = new com.toedter.calendar.JDateChooser();
-        btnSearch = new javax.swing.JButton();
         btnUsage = new javax.swing.JButton();
         btnPrint = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         cmbFiremen = new javax.swing.JComboBox();
         lblImage = new javax.swing.JLabel();
+        btnSearch = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -231,10 +250,6 @@ public class GUI_Salary extends javax.swing.JFrame {
         jPanel1.add(dateChooserTo);
         dateChooserTo.setBounds(200, 32, 95, 20);
 
-        btnSearch.setText("Søg");
-        jPanel1.add(btnSearch);
-        btnSearch.setBounds(310, 30, 90, 25);
-
         btnUsage.setText("Se Forbrug");
 
         btnPrint.setText("Udskriv");
@@ -247,48 +262,49 @@ public class GUI_Salary extends javax.swing.JFrame {
 
         lblImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
+        btnSearch.setText("Søg");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1050, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(830, 830, 830)
-                        .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(23, 23, 23))
+                .addGap(10, 10, 10)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(15, 15, 15)
+                .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1050, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(830, 830, 830)
+                .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addComponent(btnSearch))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
                         .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(10, 10, 10)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnUsage, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(14, Short.MAX_VALUE))
+                    .addComponent(btnPrint, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         pack();
