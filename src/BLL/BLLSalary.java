@@ -27,9 +27,7 @@ public class BLLSalary {
     private static BLLSalary m_instance;
     ArrayList<BESalary> salaries = new ArrayList<>();
     ArrayList<BEFireman> firemen;
-    ArrayList<BEIncidentDetails> incidentDetails;
     ArrayList<BEUsage> usage;
-    ArrayList<BEIncident> incidents;
     IDALRead dalRead;
 /**
  * Creates a private form of BLLSalary
@@ -121,18 +119,7 @@ public class BLLSalary {
      * Reads all incidents
      * @return Arraylists incidents
      */
-    public ArrayList<BEIncident> readIncidents(){
-        if(incidents == null){
-            try {
-                incidents = dalRead.readIncidents();
-            } catch (SQLException ex) {
-                BLLError.getInstance().readIncidentError();
-                return null;
-            }
-        }
-        return incidents;
-        
-    }
+   
 /**
  * Sort incidents by dates
  * @param from
@@ -141,13 +128,16 @@ public class BLLSalary {
  */
     public ArrayList<BEIncident> sortIncidents(Date from, Date to) {
         ArrayList<BEIncident> incidentsSorted = new ArrayList<>();
-       
-            for (BEIncident beincident : readIncidents()) {
+        try {       
+            for (BEIncident beincident : dalRead.readIncidents()) {
                 if (beincident.getM_date().after(from) && beincident.getM_date().before(to)) {
                     incidentsSorted.add(beincident);
-
                 }
             }
+        } catch (SQLException ex) {
+            BLLError.getInstance().readIncidentError();
+                return null;
+        }
       
         return incidentsSorted;
     }
@@ -186,16 +176,7 @@ public class BLLSalary {
  * Read all incident details
  * @return Arraylist incidentDetails
  */
-    public ArrayList<BEIncidentDetails> readIncidentDetails() {
-        if (incidentDetails == null) {
-            try {
-                incidentDetails = dalRead.readIncidentDetails();
-            } catch (SQLException ex) {
-               BLLError.getInstance().readIncidentDetailsError();
-            }
-        }
-        return incidentDetails;
-    }
+   
 /**
  * Sort incident details by incident
  * @param beincident
@@ -203,11 +184,15 @@ public class BLLSalary {
  */
     public ArrayList<BEIncidentDetails> sortIncidentDetails(BEIncident beincident) {
         ArrayList<BEIncidentDetails> sortedIncidentDetails = new ArrayList<>();
-        for (BEIncidentDetails beincidentDetails : readIncidentDetails()) {
-            if (beincidentDetails.getM_incident().getM_id() == beincident.getM_id()) {
-                sortedIncidentDetails.add(beincidentDetails);
-            }
+        try {
+            for (BEIncidentDetails beincidentDetails : dalRead.readIncidentDetails()) {
+                if (beincidentDetails.getM_incident().getM_id() == beincident.getM_id()) {
+                    sortedIncidentDetails.add(beincidentDetails);
+                }
 
+            }
+        } catch (SQLException ex) {
+            BLLError.getInstance().readIncidentDetailsError();
         }
 
         return sortedIncidentDetails;
